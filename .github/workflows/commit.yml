@@ -23,9 +23,17 @@ jobs:
           pip install -r requirements.txt  # add any additional dependencies as needed
 
       - name: Run Pipeline if requested
+        env:
+            AWS_ACCESS_KEY_ID: "ASIA356SJTTC35IPA6GE"
+            AWS_SECRET_ACCESS_KEY: "trzIwZhaWDhBPUY/iuWTSAOTSKM5Ek3Tx6zXgL3J"
+            AWS_DEFAULT_REGION: "ca-central-1"
         if: contains(github.event.head_commit.message, '[RUN PIPELINES]')
         run: python run_pipeline.py
 
       - name: Deploy if requested
+        env:
+            AWS_ACCESS_KEY_ID: "ASIA356SJTTC35IPA6GE"
+            AWS_SECRET_ACCESS_KEY: "trzIwZhaWDhBPUY/iuWTSAOTSKM5Ek3Tx6zXgL3J"
+            AWS_DEFAULT_REGION: "ca-central-1"
         if: contains(github.event.head_commit.message, '[DEPLOY]')
         run: python deployment.py
