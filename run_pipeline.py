@@ -4,7 +4,7 @@ import sys
 import os
 import subprocess
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", 'requirements.txt'])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "-r", 'requirements.txt'])
 import yaml
 # Import the get_pipeline function from the appropriate module.
 from pipelines.abalone.pipeline import get_pipeline
