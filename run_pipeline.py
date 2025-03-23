@@ -4,7 +4,7 @@ import sys
 import os
 import subprocess
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "-r", 'requirements.txt'])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "pyyaml", "sagemaker==2.240.0", "mlflow==2.16.0", "sagemaker-mlflow"])
 import yaml
 # Import the get_pipeline function from the appropriate module.
 from pipelines.abalone.pipeline import get_pipeline
