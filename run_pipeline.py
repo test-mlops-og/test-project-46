@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-import yaml
+
 import sys
 import os
 import subprocess
-import sys
-
-# Import the get_pipeline function from the appropriate module.
-from pipelines.abalone.pipeline import get_pipeline
 
 subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", 'requirements.txt'])
+import yaml
+# Import the get_pipeline function from the appropriate module.
+from pipelines.abalone.pipeline import get_pipeline
 def main():
     config_file = os.getenv("CONFIG_PATH", "config.yaml")
 
