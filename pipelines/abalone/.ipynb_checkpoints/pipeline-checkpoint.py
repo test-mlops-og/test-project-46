@@ -149,7 +149,7 @@ def get_pipeline(
     max_parallel_jobs=5,
     strategy='Random',
     hyperparameters=None,
-    dataset_version = "v1.0.0",
+    use_sg_model_registry=False,
 
 ):
     """Gets a SageMaker ML Pipeline instance working with on abalone data.
