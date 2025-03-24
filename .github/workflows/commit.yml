@@ -24,8 +24,8 @@ jobs:
 
       - name: Run Pipeline if requested
         env:
-            AWS_ACCESS_KEY_ID: "ASIA356SJTTCS3LW4FC2"
-            AWS_SECRET_ACCESS_KEY: "OVDs33o5OQWMDtrZi7iKjykSBON42s9RHGtBg4e1"
+            AWS_ACCESS_KEY_ID: "ASIA356SJTTCUTYPXBUG"
+            AWS_SECRET_ACCESS_KEY: "+KGnOdxXY636ym+GN6cA87kiFgj5dQrJ7CwurVEV"
             AWS_DEFAULT_REGION: "ca-central-1"
         if: contains(github.event.head_commit.message, '[RUN PIPELINES]')
         run: python run_pipeline.py
