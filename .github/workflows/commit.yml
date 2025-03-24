@@ -24,16 +24,16 @@ jobs:
 
       - name: Run Pipeline if requested
         env:
-            AWS_ACCESS_KEY_ID: "ASIA356SJTTCUTYPXBUG"
-            AWS_SECRET_ACCESS_KEY: "+KGnOdxXY636ym+GN6cA87kiFgj5dQrJ7CwurVEV"
+            AWS_ACCESS_KEY_ID: "AKIA356SJTTCWCNKUM7I"
+            AWS_SECRET_ACCESS_KEY: "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"
             AWS_DEFAULT_REGION: "ca-central-1"
         if: contains(github.event.head_commit.message, '[RUN PIPELINES]')
         run: python run_pipeline.py
 
       - name: Deploy if requested
         env:
-            AWS_ACCESS_KEY_ID: "ASIA356SJTTC35IPA6GE"
-            AWS_SECRET_ACCESS_KEY: "trzIwZhaWDhBPUY/iuWTSAOTSKM5Ek3Tx6zXgL3J"
+            AWS_ACCESS_KEY_ID: "AKIA356SJTTCWCNKUM7I"
+            AWS_SECRET_ACCESS_KEY: "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"
             AWS_DEFAULT_REGION: "ca-central-1"
         if: contains(github.event.head_commit.message, '[DEPLOY]')
         run: python deployment.py
