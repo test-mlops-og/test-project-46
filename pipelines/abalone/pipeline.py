@@ -18,7 +18,7 @@ import time
 
 # AWS imports
 import boto3
-
+import json
 # SageMaker imports
 import sagemaker
 import sagemaker.session
@@ -168,14 +168,6 @@ def get_pipeline(
 
     pipeline_session = get_pipeline_session(region, default_bucket)
 
-    # MLflow config initial
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    mlflow.set_tracking_uri(tracking_server_arn)
-    mlflow.set_experiment(experiment_name)
-    with mlflow.start_run(run_name=f"{experiment_name}_{timestamp}") as run:
-        run_id = run.info.run_id
-    mlflow.end_run()
-    
     # parameters for pipeline execution
     processing_instance_count = ParameterInteger(name="ProcessingInstanceCount", default_value=1)
     model_approval_status = ParameterString(
@@ -185,7 +177,12 @@ def get_pipeline(
         name="InputDataUrl",
         default_value=f"s3://sagemaker-servicecatalog-seedcode-{region}/dataset/abalone-dataset.csv",
     )
-
+    # Preprocessing step: Include the parent run id as a property file output.
+    parent_run_property = PropertyFile(
+        name="ParentRunIdProperty",
+        output_name="parent_run_id",  # Must match the ProcessingOutput defined in the preprocessing job.
+        path="parent_run_id.txt",
+    )
     # processing step for feature engineering
     sklearn_processor = SKLearnProcessor(
         framework_version="1.2-1",
@@ -200,6 +197,7 @@ def get_pipeline(
             ProcessingOutput(output_name="train", source="/opt/ml/processing/train"),
             ProcessingOutput(output_name="validation", source="/opt/ml/processing/validation"),
             ProcessingOutput(output_name="test", source="/opt/ml/processing/test"),
+            ProcessingOutput(output_name="parent_run_id", source="/opt/ml/processing/parent_run_id"),
         ],
         code=os.path.join(BASE_DIR, "preprocess.py"),
         arguments=["--input-data",
@@ -208,15 +206,20 @@ def get_pipeline(
                    experiment_name,
                    "--tracking-server-arn",
                    tracking_server_arn,
-                   "--run-id",
-                   run_id
                   ],
     )
     step_process = ProcessingStep(
         name=f"{base_job_prefix}PreprocessData",
         step_args=step_args,
+        property_files=[parent_run_property],
     )
 
+    # Use JsonGet to extract the parent run id from the preprocessing property file.
+    parent_run_id = JsonGet(
+        step_name=step_process.name,
+        property_file=parent_run_property,
+        json_path="parent_run_id"  # This extracts the content of the file.
+    )
     # Set default hyperparameter configuration if none is provided
     if hyperparameters is None:
         hyperparameters = {
@@ -230,8 +233,6 @@ def get_pipeline(
             "subsample": {"min": 0.5, "max": 1.0, "scaling_type": "Linear"},
         }
 
-    with mlflow.start_run(run_id=run_id) as run:
-        run_id = run.info.run_id
     # training step for generating model artifacts
     model_path = f"s3://{sagemaker_session.default_bucket()}/{base_job_prefix}"
     image_uri = sagemaker.image_uris.retrieve(
@@ -255,7 +256,7 @@ def get_pipeline(
         environment={
             "MLFLOW_EXPERIMENT_NAME": experiment_name,  # Experiment Name
             "MLFLOW_TRACKING_SERVER_ARN": tracking_server_arn,  # Tracking Server ARN
-            "MLFLOW_RUN_ID": run_id,  # Run ID
+            "MLFLOW_RUN_ID": parent_run_id,  # Run ID
         }
     )
 
@@ -372,7 +373,7 @@ def get_pipeline(
         env={
             "MLFLOW_EXPERIMENT_NAME": experiment_name,  # Experiment Name
             "MLFLOW_TRACKING_SERVER_ARN": tracking_server_arn,  # Tracking Server ARN
-            "MLFLOW_RUN_ID": run_id,  # Run ID
+            "MLFLOW_RUN_ID": parent_run_id,  # Run ID
             "MODEL_PACKAGE_GROUP_NAME": model_package_group_name
         },
     )

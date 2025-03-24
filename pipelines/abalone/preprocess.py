@@ -16,6 +16,7 @@ import pathlib
 import requests
 import tempfile
 import time
+import json
 
 import boto3
 import numpy as np
@@ -73,20 +74,22 @@ if __name__ == "__main__":
     parser.add_argument("--input-data", type=str, required=True)
     parser.add_argument("--experiment-name", type=str, required=True)
     parser.add_argument("--tracking-server-arn", type=str, required=True)
-    parser.add_argument("--run-id", type=str, required=True)
     args = parser.parse_args()
     input_data = args.input_data
     experiment_name = args.experiment_name
     tracking_server_arn = args.tracking_server_arn
-    run_id = args.run_id
-
     mlflow.set_tracking_uri(tracking_server_arn)
     mlflow.set_experiment(experiment_name)
+    base_dir = "/opt/ml/processing"
+    pathlib.Path(f"{base_dir}/data").mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f"{base_dir}/parent_run_id").mkdir(parents=True, exist_ok=True)
 
-    with mlflow.start_run(run_id=run_id) as parent_run:
+    # Create the parent run once and log all processing within it.
+    with mlflow.start_run() as parent_run:
+        parent_run_id = parent_run.info.run_id
+        with open(f"{base_dir}/parent_run_id/parent_run_id.txt", "w") as f:
+            json.dump({"parent_run_id": parent_run_id}, f)
         with mlflow.start_run(run_name="DataPreprocessing", nested=True):
-            base_dir = "/opt/ml/processing"
-            pathlib.Path(f"{base_dir}/data").mkdir(parents=True, exist_ok=True)
 
             bucket = input_data.split("/")[2]
             key = "/".join(input_data.split("/")[3:])
