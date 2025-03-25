@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
+import yaml
 import sys
-import os
-import subprocess
-
 import sagemaker
-import json
+import os
 
 # Import the get_pipeline function from the appropriate module.
 from pipelines.abalone.pipeline import get_pipeline
