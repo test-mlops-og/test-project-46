@@ -4,15 +4,25 @@ import sys
 import os
 import subprocess
 
-# Ensure required packages are installed
+# Function to install dependencies
 def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    print(f"Installing {package}...")
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "install", package],
+        check=False,  # Don't raise an exception immediately
+        capture_output=True,
+        text=True
+    )
+    
+    if result.returncode != 0:
+        print(f"Failed to install {package}. Error:\n{result.stderr}")
+        sys.exit(1)
 
+# Ensure required packages are installed
 try:
     import yaml
     import sagemaker
 except ImportError:
-    print("Installing missing dependencies...")
     install("pyyaml")
     install("sagemaker")
     import yaml
