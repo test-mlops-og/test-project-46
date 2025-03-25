@@ -22,14 +22,27 @@ def install(package):
 try:
     import yaml
     import sagemaker
+    import boto3
 except ImportError:
     install("sagemaker")
     install("pyyaml")
+    install("boto3")
     import yaml
     import sagemaker
+    import boto3
 
 # Import the get_pipeline function from the appropriate module.
 from pipelines.abalone.pipeline import get_pipeline
+
+def debug_s3_access(bucket_name, region):
+    try:
+        # Create a boto3 client for S3
+        s3_client = boto3.client('s3', region_name=region)
+        # Try to get the bucket's location (similar to a HeadBucket call)
+        response = s3_client.get_bucket_location(Bucket=bucket_name)
+        logging.debug(f"Bucket '{bucket_name}' is accessible. Location: {response.get('LocationConstraint')}")
+    except Exception as e:
+        logging.error(f"Debug: Unable to access bucket '{bucket_name}': {e}")
 
 def main():
     config_file = os.getenv("CONFIG_PATH", "config.yaml")
@@ -64,6 +77,9 @@ def main():
         if key in config:
             pipeline_kwargs[key] = config[key]
     print(pipeline_kwargs)
+    # Debug S3 access if default_bucket is set
+    if "default_bucket" in pipeline_kwargs:
+        debug_s3_access(pipeline_kwargs["default_bucket"], pipeline_kwargs["region"])
     try:
         # Create and deploy the pipeline.
         pipeline = get_pipeline(**pipeline_kwargs)
