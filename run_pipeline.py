@@ -4,8 +4,8 @@ import sys
 import os
 import subprocess
 
-import yaml
 import sagemaker
+import json
 
 # Import the get_pipeline function from the appropriate module.
 from pipelines.abalone.pipeline import get_pipeline
@@ -13,13 +13,16 @@ from pipelines.abalone.pipeline import get_pipeline
 def main():
     config_file = os.getenv("CONFIG_PATH", "config.yaml")
 
-    # Load configuration from YAML file.
+    # Load configuration from a JSON file instead of YAML
     try:
         with open(config_file, "r") as file:
-            config = yaml.safe_load(file)
+            config = json.load(file)
     except Exception as e:
         print(f"Error reading config file: {e}")
         sys.exit(1)
+
+    # Example of using the config
+    print("Config loaded successfully:", config)
 
     # Define required keys that must be present in the config.
     required_keys = ["region", "role", "tracking_server_arn"]
