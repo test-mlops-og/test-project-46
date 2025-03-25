@@ -4,45 +4,11 @@ import sys
 import os
 import subprocess
 
-# Function to install dependencies
-def install(package):
-    print(f"Installing {package}...")
-    result = subprocess.run(
-        [sys.executable, "-m", "pip", "install", package],
-        check=False,  # Don't raise an exception immediately
-        capture_output=True,
-        text=True
-    )
-    
-    if result.returncode != 0:
-        print(f"Failed to install {package}. Error:\n{result.stderr}")
-        sys.exit(1)
-
-# Ensure required packages are installed
-try:
-    import yaml
-    import sagemaker
-    import boto3
-except ImportError:
-    install("sagemaker")
-    install("pyyaml")
-    install("boto3")
-    import yaml
-    import sagemaker
-    import boto3
+import yaml
+import sagemaker
 
 # Import the get_pipeline function from the appropriate module.
 from pipelines.abalone.pipeline import get_pipeline
-
-def debug_s3_access(bucket_name, region):
-    try:
-        # Create a boto3 client for S3
-        s3_client = boto3.client('s3', region_name=region)
-        # Try to get the bucket's location (similar to a HeadBucket call)
-        response = s3_client.get_bucket_location(Bucket=bucket_name)
-        print(f"Bucket '{bucket_name}' is accessible. Location: {response.get('LocationConstraint')}")
-    except Exception as e:
-        print(f"Debug: Unable to access bucket '{bucket_name}': {e}")
 
 def main():
     config_file = os.getenv("CONFIG_PATH", "config.yaml")
@@ -77,9 +43,12 @@ def main():
         if key in config:
             pipeline_kwargs[key] = config[key]
     print(pipeline_kwargs)
-    # Debug S3 access if default_bucket is set
-    if "default_bucket" in pipeline_kwargs:
-        debug_s3_access(pipeline_kwargs["default_bucket"], pipeline_kwargs["region"])
+
+    region = boto3.Session().region_name
+    role = sagemaker.get_execution_role()
+    default_bucket = sagemaker.session.Session().default_bucket()
+
+    print(f"region: {region}, role: {role}, default_bucket: {default_bucket}")
     try:
         # Create and deploy the pipeline.
         pipeline = get_pipeline(**pipeline_kwargs)
