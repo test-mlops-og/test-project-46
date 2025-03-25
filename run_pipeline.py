@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import yaml
 import sys
 import sagemaker
@@ -18,9 +17,6 @@ def main():
     except Exception as e:
         print(f"Error reading config file: {e}")
         sys.exit(1)
-
-    # Example of using the config
-    print("Config loaded successfully:", config)
 
     # Define required keys that must be present in the config.
     required_keys = ["region", "role", "tracking_server_arn"]
@@ -44,12 +40,6 @@ def main():
         if key in config:
             pipeline_kwargs[key] = config[key]
     print(pipeline_kwargs)
-
-    region = boto3.Session().region_name
-    role = sagemaker.get_execution_role()
-    default_bucket = sagemaker.session.Session().default_bucket()
-
-    print(f"region: {region}, role: {role}, default_bucket: {default_bucket}")
     try:
         # Create and deploy the pipeline.
         pipeline = get_pipeline(**pipeline_kwargs)
