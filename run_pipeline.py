@@ -23,8 +23,8 @@ try:
     import yaml
     import sagemaker
 except ImportError:
-    install("pyyaml")
     install("sagemaker")
+    install("pyyaml")
     import yaml
     import sagemaker
 
