@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
-import yaml
+
 import sys
-import sagemaker
 import os
+import subprocess
+
+# Ensure required packages are installed
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+try:
+    import yaml
+    import sagemaker
+except ImportError:
+    print("Installing missing dependencies...")
+    install("pyyaml")
+    install("sagemaker")
+    import yaml
+    import sagemaker
 
 # Import the get_pipeline function from the appropriate module.
 from pipelines.abalone.pipeline import get_pipeline
