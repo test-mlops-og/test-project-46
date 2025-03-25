@@ -41,10 +41,6 @@ from sagemaker.workflow.pipeline_experiment_config import PipelineExperimentConf
 from sagemaker.workflow.properties import PropertyFile
 from sagemaker.workflow.steps import ProcessingStep, TrainingStep, CacheConfig, TuningStep
 from sagemaker.workflow.step_collections import RegisterModel
-
-# MLFlow imports
-import mlflow
-
 # Other specific imports
 from sagemaker.workflow.execution_variables import ExecutionVariables
 from sagemaker.workflow.function_step import step
