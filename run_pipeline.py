@@ -40,9 +40,9 @@ def debug_s3_access(bucket_name, region):
         s3_client = boto3.client('s3', region_name=region)
         # Try to get the bucket's location (similar to a HeadBucket call)
         response = s3_client.get_bucket_location(Bucket=bucket_name)
-        logging.debug(f"Bucket '{bucket_name}' is accessible. Location: {response.get('LocationConstraint')}")
+        print(f"Bucket '{bucket_name}' is accessible. Location: {response.get('LocationConstraint')}")
     except Exception as e:
-        logging.error(f"Debug: Unable to access bucket '{bucket_name}': {e}")
+        print(f"Debug: Unable to access bucket '{bucket_name}': {e}")
 
 def main():
     config_file = os.getenv("CONFIG_PATH", "config.yaml")
