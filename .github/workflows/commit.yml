@@ -18,8 +18,7 @@ jobs:
           python-version: '3.11.11'
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade . botocore boto3 awscli sagemaker
+        run: python -m pip install --upgrade botocore boto3 awscli sagemaker
 
       - name: Configure AWS Credentials
         id: aws_creds
