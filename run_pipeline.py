@@ -13,10 +13,10 @@ from pipelines.abalone.pipeline import get_pipeline
 def main():
     config_file = os.getenv("CONFIG_PATH", "config.yaml")
 
-    # Load configuration from a JSON file instead of YAML
+    # Load configuration from YAML file.
     try:
         with open(config_file, "r") as file:
-            config = json.load(file)
+            config = yaml.safe_load(file)
     except Exception as e:
         print(f"Error reading config file: {e}")
         sys.exit(1)
