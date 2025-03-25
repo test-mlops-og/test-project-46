@@ -80,6 +80,12 @@ def main():
     # Debug S3 access if default_bucket is set
     if "default_bucket" in pipeline_kwargs:
         debug_s3_access(pipeline_kwargs["default_bucket"], pipeline_kwargs["region"])
+    
+    region = boto3.Session().region_name
+    role = sagemaker.get_execution_role()
+    default_bucket = sagemaker.session.Session().default_bucket()
+
+    print(f"region: {region}, role: {role}, default_bucket: {default_bucket}")
     try:
         # Create and deploy the pipeline.
         pipeline = get_pipeline(**pipeline_kwargs)
